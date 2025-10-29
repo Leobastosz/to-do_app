@@ -13,8 +13,12 @@ class Categoria extends Model
         'created_by',
     ];
 
-    public function creator()
-    {
+    public function creator(){
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function tarefas(){
+        return $this->hasMany(Tarefa::class);
+        }
+
 }
