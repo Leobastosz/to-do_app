@@ -14,26 +14,33 @@ class CategoriaController extends Controller
         return view('categorias.index', compact('categorias'));
     }
 
+
     public function create()
     {
         return view('categorias.create');
     }
 
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'nome'      => 'required|string|max:255',
-            'descricao' => 'nullable|string',
-        ]);
 
-        $data['created_by'] = Auth::id();
+  public function store(Request $request)
+        {
+    $validated = $request->validate([
+        'nome' => 'required|string|max:255',
+        'descricao' => 'nullable|string',
+        'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-        $categoria = Categoria::create($data);
-
-        return redirect()
-            ->route('categorias.show', $categoria)
-            ->with('success', 'Categoria criada com sucesso!');
+    if ($request->hasFile('imagem')) {
+        $path = $request->file('imagem')->store('categorias', 'public');
+        $validated['imagem'] = $path;
     }
+
+    $validated['created_by'] = auth()->id();
+
+    Categoria::create($validated);
+
+    return redirect()->route('categorias.index')->with('success', 'Categoria criada com sucesso!');
+        }
+
 
     public function show(Categoria $categoria)
     {
@@ -45,23 +52,29 @@ class CategoriaController extends Controller
         return view('categorias.edit', compact('categoria'));
     }
 
+
     public function update(Request $request, Categoria $categoria)
-    {
-        $data = $request->validate([
-            'nome'      => 'required|string|max:255',
+        {
+        $validated = $request->validate([
+            'nome' => 'required|string|max:255',
             'descricao' => 'nullable|string',
+            'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        if ($categoria->created_by !== Auth::id()) {
-            abort(403);
+        if ($request->hasFile('imagem')) {
+            if ($categoria->imagem && \Storage::disk('public')->exists($categoria->imagem)) {
+                \Storage::disk('public')->delete($categoria->imagem);
+            }
+
+            $path = $request->file('imagem')->store('categorias', 'public');
+            $validated['imagem'] = $path;
         }
 
-        $categoria->update($data);
+        $categoria->update($validated);
 
-        return redirect()
-            ->route('categorias.show', $categoria)
-            ->with('success', 'Categoria atualizada com sucesso!');
-    }
+        return redirect()->route('categorias.index')->with('success', 'Categoria atualizada com sucesso!');
+        }
+        
 
     public function destroy(Categoria $categoria)
     {

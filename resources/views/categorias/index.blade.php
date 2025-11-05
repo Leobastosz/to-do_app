@@ -23,6 +23,7 @@
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
+                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase ml-4">Ícone</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Nome</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Descrição</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Ações</th>
@@ -32,6 +33,13 @@
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                 @forelse ($categorias as $categoria)
                     <tr>
+                        <td>
+                            @if($categoria->imagem)
+                            <img src="{{ asset('storage/' . $categoria->imagem) }}" alt="Imagem da categoria" class="w-16 h-16 object-cover rounded ml-4">
+                            @else
+                            <span class="text-gray-400 ml-4">Sem imagem</span>
+                             @endif
+                        </td>
                         <td class="px-6 py-4">{{ $categoria->nome }}</td>
                         <td class="px-6 py-4">{{ $categoria->descricao ?? '-' }}</td>
                         <td class="px-6 py-4 text-right">

@@ -10,6 +10,7 @@ class Categoria extends Model
     protected $fillable = [
         'nome',
         'descricao',
+        'imagem',
         'created_by',
     ];
 
@@ -19,6 +20,6 @@ class Categoria extends Model
 
     public function tarefas(){
         return $this->hasMany(Tarefa::class);
-        }
+    }
 
 }
