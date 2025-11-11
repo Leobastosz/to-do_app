@@ -13,7 +13,7 @@
          alt="Imagem da categoria" 
          class="w-48 h-48 object-cover rounded shadow-md">
     @endif
-    <p class="text-gray-700 dark:text-gray-300"><strong>ID:</strong> {{ $categoria->id }}</p>
+    <p class="text-gray-700 dark:text-gray-300" hidden><strong>ID:</strong> {{ $categoria->id }}</p>
     <p class="text-gray-700 dark:text-gray-300"><strong>Nome:</strong> {{ $categoria->nome }}</p>
      <p class="text-gray-700 dark:text-gray-300"><strong>Descrição:</strong> {{ $categoria->descricao }}</p>
     
