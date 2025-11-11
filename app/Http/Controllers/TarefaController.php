@@ -3,115 +3,121 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tarefa;
-use App\Models\Categoria;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class TarefaController extends Controller
 {
-    
+    /**
+     * Exibe a lista de tarefas
+     */
     public function index()
     {
-        $tarefas = Tarefa::where('created_by', Auth::id())
-                         ->with('categoria')
-                         ->latest()
-                         ->get();
-
-        return view('tarefas.index', compact('tarefas'));
+        $tarefas = Tarefa::latest()->get();
+        return view('tarefa.index', compact('tarefas'));
     }
 
-  
-
+    /**
+     * Mostra o formulário de criação
+     */
     public function create()
     {
-        $categorias = Categoria::where('created_by', Auth::id())->get();
-        return view('tarefas.create', compact('categorias'));
+        return view('tarefa.create');
     }
 
-   
-
+    /**
+     * Armazena uma nova tarefa
+     */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
-            'data_limite' => 'nullable|date',
-            'categoria_id' => 'required|exists:categorias,id',
+            'arquivo' => 'nullable|file|max:20480', // até 20MB
         ]);
 
-        Tarefa::create([
-            'titulo' => $request->titulo,
-            'descricao' => $request->descricao,
-            'data_limite' => $request->data_limite,
-            'categoria_id' => $request->categoria_id,
-            'created_by' => Auth::id(),
-        ]);
+        $tarefa = new Tarefa();
+        $tarefa->titulo = $validated['titulo'];
+        $tarefa->descricao = $validated['descricao'] ?? null;
 
-        return redirect()->route('tarefas.index')->with('success', 'Tarefa criada com sucesso!');
+        // Upload do arquivo (opcional)
+        if ($request->hasFile('arquivo')) {
+            $path = $request->file('arquivo')->store('categorias', 'public');
+            $tarefa->arquivo = $path;
+        }
+
+        $tarefa->save();
+
+        return redirect()
+            ->route('tarefas.index')
+            ->with('success', 'Tarefa criada com sucesso!');
     }
 
-    
-
-    public function show(Tarefa $tarefa)
+    /**
+     * Exibe uma tarefa específica
+     */
+    public function show($id)
     {
-        $this->authorizeAcesso($tarefa);
-        return view('tarefas.show', compact('tarefa'));
+        $tarefa = Tarefa::findOrFail($id);
+        return view('tarefa.show', compact('tarefa'));
     }
 
-    
-
-    public function edit(Tarefa $tarefa)
+    /**
+     * Mostra o formulário de edição
+     */
+    public function edit($id)
     {
-        $this->authorizeAcesso($tarefa);
-        $categorias = Categoria::where('created_by', Auth::id())->get();
-        return view('tarefas.edit', compact('tarefa', 'categorias'));
+        $tarefa = Tarefa::findOrFail($id);
+        return view('tarefa.edit', compact('tarefa'));
     }
 
-  
-
-    public function update(Request $request, Tarefa $tarefa)
+    /**
+     * Atualiza a tarefa
+     */
+    public function update(Request $request, $id)
     {
-        $this->authorizeAcesso($tarefa);
-
-        $request->validate([
+        $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
-            'data_limite' => 'nullable|date',
-            'categoria_id' => 'required|exists:categorias,id',
-            'concluida' => 'nullable|boolean',
+            'arquivo' => 'nullable|file|max:20480',
         ]);
 
-        $tarefa->update($request->only(['titulo', 'descricao', 'data_limite', 'categoria_id', 'concluida']));
+        $tarefa = Tarefa::findOrFail($id);
+        $tarefa->titulo = $validated['titulo'];
+        $tarefa->descricao = $validated['descricao'] ?? null;
 
-        return redirect()->route('tarefas.index')->with('success', 'Tarefa atualizada com sucesso!');
+        // Atualiza o arquivo se enviado
+        if ($request->hasFile('arquivo')) {
+            if ($tarefa->arquivo && Storage::disk('public')->exists($tarefa->arquivo)) {
+                Storage::disk('public')->delete($tarefa->arquivo);
+            }
+
+            $path = $request->file('arquivo')->store('categorias', 'public');
+            $tarefa->arquivo = $path;
+        }
+
+        $tarefa->save();
+
+        return redirect()
+            ->route('tarefas.index')
+            ->with('success', 'Tarefa atualizada com sucesso!');
     }
 
- 
-
-    public function destroy(Tarefa $tarefa)
+    /**
+     * Exclui a tarefa
+     */
+    public function destroy($id)
     {
-        $this->authorizeAcesso($tarefa);
+        $tarefa = Tarefa::findOrFail($id);
+
+        if ($tarefa->arquivo && Storage::disk('public')->exists($tarefa->arquivo)) {
+            Storage::disk('public')->delete($tarefa->arquivo);
+        }
+
         $tarefa->delete();
 
-        return redirect()->route('tarefas.index')->with('success', 'Tarefa excluída com sucesso!');
-    }
-
-
-
-    public function toggleStatus(Tarefa $tarefa)
-    {
-        $this->authorizeAcesso($tarefa);
-        $tarefa->update(['concluida' => !$tarefa->concluida]);
-
-        return redirect()->route('tarefas.index')->with('success', 'Status da tarefa atualizado!');
-    }
-
-    
-    
-    private function authorizeAcesso(Tarefa $tarefa)
-    {
-        if ($tarefa->created_by !== Auth::id()) {
-            abort(403, 'Acesso negado.');
-        }
+        return redirect()
+            ->route('tarefas.index')
+            ->with('success', 'Tarefa excluída com sucesso!');
     }
 }
