@@ -1,62 +1,44 @@
 @extends('layouts.main')
 
 @section('title', 'Editar Tarefa')
-@section('header', 'Editar Tarefa')
 
 @section('content')
-<div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-    <form action="{{ route('tarefas.update', $tarefa) }}" method="POST">
+<div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-6">
+    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-6">Editar Tarefa</h2>
+
+    <form action="{{ route('tarefas.update', $tarefa->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
         @csrf
         @method('PUT')
 
-        <div class="mb-4">
-            <label for="titulo" class="block text-gray-700 dark:text-gray-200 font-medium">Título</label>
-            <input type="text" name="titulo" id="titulo" 
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
-                   value="{{ old('titulo', $tarefa->titulo) }}">
-            @error('titulo')
-                <span class="text-red-600 text-sm">{{ $message }}</span>
-            @enderror
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Título</label>
+            <input type="text" name="titulo" value="{{ $tarefa->titulo }}" required
+                class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
         </div>
 
-        <div class="mb-4">
-            <label for="categoria_id" class="block text-gray-700 dark:text-gray-200 font-medium">Categoria</label>
-            <select name="categoria_id" id="categoria_id" 
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
-                <option value="">Selecione uma categoria</option>
-                @foreach($categorias as $categoria)
-                    <option value="{{ $categoria->id }}" {{ old('categoria_id', $tarefa->categoria_id) == $categoria->id ? 'selected' : '' }}>
-                        {{ $categoria->nome }}
-                    </option>
-                @endforeach
-            </select>
-            @error('categoria_id')
-                <span class="text-red-600 text-sm">{{ $message }}</span>
-            @enderror
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
+            <textarea name="descricao" rows="4"
+                class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ $tarefa->descricao }}</textarea>
         </div>
 
-        <div class="mb-4">
-            <label for="data_limite" class="block text-gray-700 dark:text-gray-200 font-medium">Data Limite</label>
-            <input type="date" name="data_limite" id="data_limite"
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
-                   value="{{ old('data_limite', $tarefa->data_limite) }}">
-            @error('data_limite')
-                <span class="text-red-600 text-sm">{{ $message }}</span>
-            @enderror
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Substituir Arquivo</label>
+            <input type="file" name="arquivo"
+                class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600" />
+            @if ($tarefa->arquivo)
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Arquivo atual:
+                    <a href="{{ Storage::url($tarefa->arquivo) }}" target="_blank" class="text-blue-500 hover:underline">
+                        {{ basename($tarefa->arquivo) }}
+                    </a>
+                </p>
+            @endif
         </div>
 
-        <div class="mb-4 flex items-center">
-            <input type="checkbox" name="concluida" id="concluida" value="1" {{ old('concluida', $tarefa->concluida) ? 'checked' : '' }} 
-                   class="mr-2">
-            <label for="concluida" class="text-gray-700 dark:text-gray-200 font-medium">Concluída</label>
-        </div>
-
-        <div class="flex justify-end">
-            <a href="{{ route('tarefas.index') }}" 
-               class="mr-2 px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500">
-               Cancelar
-            </a>
-            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">Atualizar</button>
+        <div class="flex justify-end gap-3">
+            <a href="{{ route('tarefas.index') }}" class="px-4 py-2 rounded-md bg-gray-300 text-gray-700 hover:bg-gray-400">Cancelar</a>
+            <button type="submit" class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">Atualizar</button>
         </div>
     </form>
 </div>
