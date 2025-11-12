@@ -14,6 +14,9 @@
             <thead class="bg-gray-100 dark:bg-gray-700">
                 <tr>
                     <th class="px-4 py-2">Título</th>
+                    <th class="px-4 py-2">Categoria</th>
+                    <th class="px-4 py-2">Data Limite</th>
+                    <th class="px-4 py-2">Concluída</th>
                     <th class="px-4 py-2">Arquivo</th>
                     <th class="px-4 py-2 text-right">Ações</th>
                 </tr>
@@ -21,7 +24,33 @@
             <tbody>
                 @forelse ($tarefas as $tarefa)
                     <tr class="border-b dark:border-gray-700">
+                        {{-- Título --}}
                         <td class="px-4 py-3">{{ $tarefa->titulo }}</td>
+
+                        {{-- Categoria --}}
+                        <td class="px-4 py-3">
+                            {{ $tarefa->categoria->nome ?? '—' }}
+                        </td>
+
+                        {{-- Data limite --}}
+                        <td class="px-4 py-3">
+                            @if ($tarefa->data_limite)
+                                {{ \Carbon\Carbon::parse($tarefa->data_limite)->format('d/m/Y') }}
+                            @else
+                                <span class="text-gray-400 italic">Sem data</span>
+                            @endif
+                        </td>
+
+                        {{-- Concluída --}}
+                        <td class="px-4 py-3 text-center">
+                            @if ($tarefa->concluida)
+                                <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Sim</span>
+                            @else
+                                <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Não</span>
+                            @endif
+                        </td>
+
+                        {{-- Arquivo --}}
                         <td class="px-4 py-3">
                             @if ($tarefa->arquivo)
                                 <a href="{{ Storage::url($tarefa->arquivo) }}" target="_blank" class="text-blue-500 hover:underline">
@@ -31,6 +60,8 @@
                                 <span class="text-gray-400 italic">Nenhum</span>
                             @endif
                         </td>
+
+                        {{-- Ações --}}
                         <td class="px-4 py-3 text-right space-x-2">
                             <a href="{{ route('tarefas.show', $tarefa->id) }}" class="text-green-500 hover:underline">Ver</a>
                             <a href="{{ route('tarefas.edit', $tarefa->id) }}" class="text-yellow-500 hover:underline">Editar</a>
@@ -42,7 +73,9 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="3" class="px-4 py-4 text-center text-gray-500">Nenhuma tarefa encontrada.</td></tr>
+                    <tr>
+                        <td colspan="6" class="px-4 py-4 text-center text-gray-500">Nenhuma tarefa encontrada.</td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>

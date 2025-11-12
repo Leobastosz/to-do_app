@@ -51,6 +51,32 @@
                 class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
         </div>
 
+        {{-- Categoria --}}
+        <div>
+            <label for="categoria_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoria</label>
+            <select id="categoria_id" name="categoria_id"
+                class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                <option value="">Selecione uma categoria</option>
+                @foreach ($categorias as $categoria)
+                    <option value="{{ $categoria->id }}">{{ $categoria->nome }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- Data limite --}}
+        <div>
+            <label for="data_limite" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data Limite</label>
+            <input type="date" id="data_limite" name="data_limite"
+                class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        {{-- Concluída --}}
+        <div class="flex items-center">
+            <input type="checkbox" id="concluida" name="concluida" value="1"
+                class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+            <label for="concluida" class="ml-2 text-sm text-gray-700 dark:text-gray-300">Marcar como concluída</label>
+        </div>
+
         {{-- Upload de arquivo --}}
         <div>
             <label for="arquivo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Anexar Arquivo</label>

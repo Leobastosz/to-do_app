@@ -5,45 +5,46 @@ namespace App\Http\Controllers;
 use App\Models\Tarefa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\Auth;
 
 class TarefaController extends Controller
 {
-    /**
-     * Exibe a lista de tarefas
-     */
+   
     public function index()
     {
-        $tarefas = Tarefa::latest()->get();
-        return view('tarefa.index', compact('tarefas'));
+        $tarefas = Tarefa::where('created_by', Auth::id())->latest()->get();
+        return view('tarefas.index', compact('tarefas'));
     }
 
-    /**
-     * Mostra o formulário de criação
-     */
     public function create()
     {
-        return view('tarefa.create');
+         $categorias = \App\Models\Categoria::where('created_by', auth()->id())->get();
+        return view('tarefas.create', compact('categorias'));
     }
 
-    /**
-     * Armazena uma nova tarefa
-     */
+    
     public function store(Request $request)
     {
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
-            'arquivo' => 'nullable|file|max:20480', // até 20MB
+            'categoria_id' => 'required|integer|exists:categorias,id',
+            'data_limite' => 'nullable|date',
+            'concluida' => 'nullable|boolean',
+            'arquivo' => 'nullable|file|max:20480',
         ]);
 
         $tarefa = new Tarefa();
         $tarefa->titulo = $validated['titulo'];
         $tarefa->descricao = $validated['descricao'] ?? null;
+        $tarefa->categoria_id = $validated['categoria_id'];
+        $tarefa->data_limite = $validated['data_limite'] ?? null;
+        $tarefa->concluida = $validated['concluida'] ?? false;
+        $tarefa->created_by = Auth::id();
 
-        // Upload do arquivo (opcional)
+       
         if ($request->hasFile('arquivo')) {
-            $path = $request->file('arquivo')->store('categorias', 'public');
+            $path = $request->file('arquivo')->store('tarefas', 'public');
             $tarefa->arquivo = $path;
         }
 
@@ -54,46 +55,58 @@ class TarefaController extends Controller
             ->with('success', 'Tarefa criada com sucesso!');
     }
 
-    /**
-     * Exibe uma tarefa específica
-     */
+    
+   
     public function show($id)
     {
-        $tarefa = Tarefa::findOrFail($id);
-        return view('tarefa.show', compact('tarefa'));
+        $tarefa = Tarefa::where('id', $id)
+            ->where('created_by', Auth::id())
+            ->firstOrFail();
+
+        return view('tarefas.show', compact('tarefa'));
     }
 
-    /**
-     * Mostra o formulário de edição
-     */
+
+   
     public function edit($id)
     {
-        $tarefa = Tarefa::findOrFail($id);
-        return view('tarefa.edit', compact('tarefa'));
+        $tarefa = Tarefa::where('id', $id)
+            ->where('created_by', Auth::id())
+            ->firstOrFail();
+
+        return view('tarefas.edit', compact('tarefa'));
     }
 
-    /**
-     * Atualiza a tarefa
-     */
+    
+
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',
+            'categoria_id' => 'required|integer|exists:categorias,id',
+            'data_limite' => 'nullable|date',
+            'concluida' => 'nullable|boolean',
             'arquivo' => 'nullable|file|max:20480',
         ]);
 
-        $tarefa = Tarefa::findOrFail($id);
+        $tarefa = Tarefa::where('id', $id)
+            ->where('created_by', Auth::id())
+            ->firstOrFail();
+
         $tarefa->titulo = $validated['titulo'];
         $tarefa->descricao = $validated['descricao'] ?? null;
+        $tarefa->categoria_id = $validated['categoria_id'];
+        $tarefa->data_limite = $validated['data_limite'] ?? null;
+        $tarefa->concluida = $validated['concluida'] ?? false;
 
-        // Atualiza o arquivo se enviado
+        
         if ($request->hasFile('arquivo')) {
             if ($tarefa->arquivo && Storage::disk('public')->exists($tarefa->arquivo)) {
                 Storage::disk('public')->delete($tarefa->arquivo);
             }
 
-            $path = $request->file('arquivo')->store('categorias', 'public');
+            $path = $request->file('arquivo')->store('tarefas', 'public');
             $tarefa->arquivo = $path;
         }
 
@@ -104,12 +117,12 @@ class TarefaController extends Controller
             ->with('success', 'Tarefa atualizada com sucesso!');
     }
 
-    /**
-     * Exclui a tarefa
-     */
+   
     public function destroy($id)
     {
-        $tarefa = Tarefa::findOrFail($id);
+        $tarefa = Tarefa::where('id', $id)
+            ->where('created_by', Auth::id())
+            ->firstOrFail();
 
         if ($tarefa->arquivo && Storage::disk('public')->exists($tarefa->arquivo)) {
             Storage::disk('public')->delete($tarefa->arquivo);

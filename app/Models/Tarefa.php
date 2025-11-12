@@ -16,7 +16,7 @@ class Tarefa extends Model
         'data_limite',
         'categoria_id',
         'created_by',
-        'arquivo', // novo campo para upload
+        'arquivo', 
     ];
 
     /**
