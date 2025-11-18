@@ -24,6 +24,7 @@
             <tbody>
                 @forelse ($tarefas as $tarefa)
                     <tr class="border-b dark:border-gray-700">
+                        
                         {{-- Título --}}
                         <td class="px-4 py-3">{{ $tarefa->titulo }}</td>
 
@@ -63,13 +64,39 @@
 
                         {{-- Ações --}}
                         <td class="px-4 py-3 text-right space-x-2">
+
+                            {{-- Ver --}}
                             <a href="{{ route('tarefas.show', $tarefa->id) }}" class="text-green-500 hover:underline">Ver</a>
+
+                            {{-- Editar --}}
                             <a href="{{ route('tarefas.edit', $tarefa->id) }}" class="text-yellow-500 hover:underline">Editar</a>
+
+                            {{-- Botão marcar como concluída --}}
+                            @if (!$tarefa->concluida)
+                                <form action="{{ route('tarefas.update', $tarefa->id) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    @method('PUT')
+
+                                    {{-- Inputs ocultos para não perder os outros campos obrigatórios --}}
+                                    <input type="hidden" name="titulo" value="{{ $tarefa->titulo }}">
+                                    <input type="hidden" name="descricao" value="{{ $tarefa->descricao }}">
+                                    <input type="hidden" name="categoria_id" value="{{ $tarefa->categoria_id }}">
+                                    <input type="hidden" name="data_limite" value="{{ $tarefa->data_limite }}">
+                                    <input type="hidden" name="concluida" value="1">
+
+                                    <button type="submit" class="text-blue-600 hover:underline">
+                                        Concluir
+                                    </button>
+                                </form>
+                            @endif
+
+                            {{-- Excluir --}}
                             <form action="{{ route('tarefas.destroy', $tarefa->id) }}" method="POST" class="inline-block delete-form">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-500 hover:underline">Excluir</button>
                             </form>
+
                         </td>
                     </tr>
                 @empty
@@ -82,7 +109,7 @@
     </div>
 </div>
 
-{{-- Confirmação com SweetAlert2 --}}
+{{-- Confirmação SweetAlert2 --}}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const forms = document.querySelectorAll('.delete-form');

@@ -79,7 +79,7 @@
 
         {{-- Upload de arquivo --}}
         <div>
-            <label for="arquivo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Anexar Arquivo</label>
+            <label for="arquivo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Anexar Arquivo (somente arquivos .zip)</label>
             <input type="file" id="arquivo" name="arquivo"
                 class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Arquivos até 20 MB (imagens, PDF, DOC, etc.)</p>

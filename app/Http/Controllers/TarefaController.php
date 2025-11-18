@@ -25,6 +25,7 @@ class TarefaController extends Controller
     
     public function store(Request $request)
     {
+
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descricao' => 'nullable|string',

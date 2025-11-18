@@ -54,7 +54,7 @@
 
         {{-- Substituir arquivo --}}
         <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Substituir Arquivo</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Substituir Arquivo (somente arquivos .zip)</label>
             <input type="file" name="arquivo"
                 class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600" />
             @if ($tarefa->arquivo)

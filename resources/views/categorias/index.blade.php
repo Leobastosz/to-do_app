@@ -13,11 +13,7 @@
         </a>
     </div>
 
-    @if (session('success'))
-        <div class="bg-green-100 text-green-800 p-3 rounded mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
+  
 
     <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-lg">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
