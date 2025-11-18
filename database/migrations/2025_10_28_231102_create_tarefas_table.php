@@ -14,6 +14,7 @@ return new class extends Migration
             $table->text('descricao')->nullable();
             $table->boolean('concluida')->default(false);
             $table->date('data_limite')->nullable();
+            
 
             $table->foreignId('categoria_id')
                   ->constrained('categorias')

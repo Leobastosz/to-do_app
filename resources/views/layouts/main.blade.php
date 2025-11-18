@@ -24,5 +24,29 @@
             @yield('content')
         </main>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if (session('success'))
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Sucesso!',
+    text: '{{ session('success') }}',
+    confirmButtonColor: '#3085d6',
+});
+</script>
+@endif
+
+@if ($errors->any())
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Erro!',
+    html: `{!! implode('<br>', $errors->all()) !!}`,
+    confirmButtonColor: '#d33',
+});
+</script>
+@endif
+
 </body>
 </html>
